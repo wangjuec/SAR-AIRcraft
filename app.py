@@ -28,7 +28,7 @@ with st.sidebar:
     selected_image = st.selectbox("选择示例图片", image_files)
     st.write("雷达图较大，请耐心等待加载！")
 
-@st.cache_data
+# @st.cache_data
 def load_image(image_path):
     return Image.open(image_path)
 
@@ -39,7 +39,7 @@ def load_annotations(label_path):
         return tree.getroot()
     return None
 
-@st.cache_resource
+# @st.cache_resource
 def load_model(model_path):
     return YOLO(model_path)
 
