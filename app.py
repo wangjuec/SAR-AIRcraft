@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 import cv2
 from ultralytics import YOLO
 
-# 设置页面配置，启用宽屏模式
+# 设置页面配置
 st.set_page_config(layout="centered", 
                    initial_sidebar_state="expanded", 
                    page_title="YOLO 目标检测演示", 
@@ -28,68 +28,73 @@ with st.sidebar:
     selected_image = st.selectbox("选择示例图片", image_files)
     st.write("雷达图较大，请耐心等待加载！")
 
+@st.cache_data
+def load_image(image_path):
+    return Image.open(image_path)
+
+@st.cache_data
+def load_annotations(label_path):
+    if os.path.exists(label_path):
+        tree = ET.parse(label_path)
+        return tree.getroot()
+    return None
+
+@st.cache_resource
+def load_model(model_path):
+    return YOLO(model_path)
+
+def draw_annotations(image, annotations, color, label_color):
+    for annotation in annotations:
+        filename = annotation.find('filename').text
+        if filename == selected_image:
+            for obj in annotation.findall('object'):
+                name = obj.find('name').text
+                bndbox = obj.find('bndbox')
+                xmin = int(bndbox.find('xmin').text)
+                ymin = int(bndbox.find('ymin').text)
+                xmax = int(bndbox.find('xmax').text)
+                ymax = int(bndbox.find('ymax').text)
+                cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
+                cv2.putText(image, name, (xmin, ymin - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, label_color, 2)
+    return image
+
+def draw_yolo_predictions(image, results, color, label_color):
+    for result in results:
+        boxes = result.boxes  # Boxes 对象，包含边界框输出
+        for i in range(len(boxes)):
+            xmin, ymin, xmax, ymax = map(int, boxes.xyxy[i])
+            label = result.names[int(boxes.cls[i])]
+            confidence = float(boxes.conf[i])
+            cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
+            cv2.putText(image, f"{label} {confidence:.2f}", (xmin, ymin - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, label_color, 2)
+    return image
+
 if selected_image:
     # 显示原始图片
     image_path = os.path.join(images_folder, selected_image)
-    image = Image.open(image_path)
+    image = load_image(image_path)
     
     # 加载标记
     label_path = os.path.join(labels_folder, "annotations.xml")
-    if os.path.exists(label_path):
-        tree = ET.parse(label_path)
-        root = tree.getroot()
+    root = load_annotations(label_path)
 
     # 显示原始标记图片
     image_cv_original = cv2.imread(image_path)
-    for annotation in root.findall('annotation'):
-        filename = annotation.find('filename').text
-        if filename == selected_image:
-            for obj in annotation.findall('object'):
-                name = obj.find('name').text
-                bndbox = obj.find('bndbox')
-                xmin = int(bndbox.find('xmin').text)
-                ymin = int(bndbox.find('ymin').text)
-                xmax = int(bndbox.find('xmax').text)
-                ymax = int(bndbox.find('ymax').text)
-                cv2.rectangle(image_cv_original, (xmin, ymin), (xmax, ymax), (255, 0, 0), 2)
-                cv2.putText(image_cv_original, name, (xmin, ymin - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 0, 0), 2)
+    if root:
+        image_cv_original = draw_annotations(image_cv_original, root.findall('annotation'), (255, 0, 0), (255, 0, 0))
 
     # 进行YOLO预测
     model_path = os.path.join(models_folder, "best.pt")
-    model = YOLO(model_path)
+    model = load_model(model_path)
     results = model(image_path)
     image_cv_yolo = cv2.imread(image_path)
-    for result in results:
-        boxes = result.boxes  # Boxes 对象，包含边界框输出
-        for i in range(len(boxes)):
-            xmin, ymin, xmax, ymax = map(int, boxes.xyxy[i])
-            label = result.names[int(boxes.cls[i])]
-            confidence = float(boxes.conf[i])
-            cv2.rectangle(image_cv_yolo, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
-            cv2.putText(image_cv_yolo, f"{label} {confidence:.2f}", (xmin, ymin - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+    image_cv_yolo = draw_yolo_predictions(image_cv_yolo, results, (0, 255, 0), (0, 255, 0))
 
     # 显示叠加对比图片
     image_cv_combined = cv2.imread(image_path)
-    for annotation in root.findall('annotation'):
-        filename = annotation.find('filename').text
-        if filename == selected_image:
-            for obj in annotation.findall('object'):
-                name = obj.find('name').text
-                bndbox = obj.find('bndbox')
-                xmin = int(bndbox.find('xmin').text)
-                ymin = int(bndbox.find('ymin').text)
-                xmax = int(bndbox.find('xmax').text)
-                ymax = int(bndbox.find('ymax').text)
-                cv2.rectangle(image_cv_combined, (xmin, ymin), (xmax, ymax), (255, 0, 0), 2)
-                cv2.putText(image_cv_combined, name, (xmin, ymin - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 0, 0), 2)
-    for result in results:
-        boxes = result.boxes  # Boxes 对象，包含边界框输出
-        for i in range(len(boxes)):
-            xmin, ymin, xmax, ymax = map(int, boxes.xyxy[i])
-            label = result.names[int(boxes.cls[i])]
-            confidence = float(boxes.conf[i])
-            cv2.rectangle(image_cv_combined, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
-            cv2.putText(image_cv_combined, f"{label} {confidence:.2f}", (xmin, ymin - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+    if root:
+        image_cv_combined = draw_annotations(image_cv_combined, root.findall('annotation'), (255, 0, 0), (255, 0, 0))
+    image_cv_combined = draw_yolo_predictions(image_cv_combined, results, (0, 255, 0), (0, 255, 0))
 
     # 创建2*2网格布局
     col1, col2 = st.columns(2)
@@ -99,3 +104,5 @@ if selected_image:
     col2.image(image_cv_original, caption="原始标记图片", use_column_width=True)
     col3.image(image_cv_yolo, caption="YOLO预测图片", use_column_width=True)
     col4.image(image_cv_combined, caption="叠加对比图片", use_column_width=True)
+
+    st.success("预测完成", icon="✅")
