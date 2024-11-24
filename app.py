@@ -30,12 +30,13 @@ with st.sidebar:
 
 def load_image(image_path):
     return Image.open(image_path)
+  
 def load_annotations(label_path):
     if os.path.exists(label_path):
         tree = ET.parse(label_path)
         return tree.getroot()
     return None
-@st.cache_resource
+
 def load_model(model_path):
     return YOLO(model_path)
 
@@ -97,5 +98,3 @@ if selected_image:
     col2.image(image_cv_original, caption="原始标记图片", use_column_width=True)
     col3.image(image_cv_yolo, caption="YOLO预测图片", use_column_width=True)
     col4.image(image_cv_combined, caption="叠加对比图片", use_column_width=True)
-
-    st.success("预测完成", icon="✅")
