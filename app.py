@@ -28,18 +28,14 @@ with st.sidebar:
     selected_image = st.selectbox("选择示例图片", image_files)
     st.write("雷达图较大，请耐心等待加载！")
 
-# @st.cache_data
 def load_image(image_path):
     return Image.open(image_path)
-
-@st.cache_data
 def load_annotations(label_path):
     if os.path.exists(label_path):
         tree = ET.parse(label_path)
         return tree.getroot()
     return None
-
-# @st.cache_resource
+@st.cache_resource
 def load_model(model_path):
     return YOLO(model_path)
 
@@ -57,7 +53,6 @@ def draw_annotations(image, annotations, color, label_color):
                 cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
                 cv2.putText(image, name, (xmin, ymin - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, label_color, 2)
     return image
-
 def draw_yolo_predictions(image, results, color, label_color):
     for result in results:
         boxes = result.boxes  # Boxes 对象，包含边界框输出
@@ -80,8 +75,7 @@ if selected_image:
 
     # 显示原始标记图片
     image_cv_original = cv2.imread(image_path)
-    if root:
-        image_cv_original = draw_annotations(image_cv_original, root.findall('annotation'), (255, 0, 0), (255, 0, 0))
+    image_cv_original = draw_annotations(image_cv_original, root.findall('annotation'), (255, 0, 0), (255, 0, 0))
 
     # 进行YOLO预测
     model_path = os.path.join(models_folder, "best.pt")
@@ -92,8 +86,7 @@ if selected_image:
 
     # 显示叠加对比图片
     image_cv_combined = cv2.imread(image_path)
-    if root:
-        image_cv_combined = draw_annotations(image_cv_combined, root.findall('annotation'), (255, 0, 0), (255, 0, 0))
+    image_cv_combined = draw_annotations(image_cv_combined, root.findall('annotation'), (255, 0, 0), (255, 0, 0))
     image_cv_combined = draw_yolo_predictions(image_cv_combined, results, (0, 255, 0), (0, 255, 0))
 
     # 创建2*2网格布局
