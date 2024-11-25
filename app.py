@@ -94,7 +94,7 @@ if selected_image:
     col1, col2 = st.columns(2)
     col3, col4 = st.columns(2)
 
-    col1.image(image, caption="原始图片", use_column_width=True)
-    col2.image(image_cv_original, caption="原始标记图片", use_column_width=True)
-    col3.image(image_cv_yolo, caption="YOLO预测图片", use_column_width=True)
-    col4.image(image_cv_combined, caption="叠加对比图片", use_column_width=True)
+    col1.image(image, caption="原始图片")
+    col2.image(image_cv_original, caption="原始标记图片")
+    col3.image(image_cv_yolo, caption="YOLO预测图片")
+    col4.image(image_cv_combined, caption="叠加对比图片")
