@@ -30,7 +30,8 @@ with st.sidebar:
 
 def load_image(image_path):
     return Image.open(image_path)
-  
+
+@st.cache_resource
 def load_annotations(label_path):
     if os.path.exists(label_path):
         tree = ET.parse(label_path)
