@@ -37,6 +37,7 @@ def load_annotations(label_path):
         return tree.getroot()
     return None
 
+@st.cache_resource
 def load_model(model_path):
     return YOLO(model_path)
 
@@ -54,6 +55,7 @@ def draw_annotations(image, annotations, color, label_color):
                 cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
                 cv2.putText(image, name, (xmin, ymin - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, label_color, 2)
     return image
+  
 def draw_yolo_predictions(image, results, color, label_color):
     for result in results:
         boxes = result.boxes  # Boxes 对象，包含边界框输出
