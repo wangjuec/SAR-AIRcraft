@@ -1,3 +1,6 @@
+sudo apt-get update
+sudo apt-get install libglu1-mesa
+
 import streamlit as st
 import os
 from PIL import Image
