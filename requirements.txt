@@ -1,5 +1,4 @@
 streamlit
 Pillow
-opencv-python
 opencv-python-headless
 ultralytics
