@@ -3,3 +3,4 @@ Pillow
 opencv-python-headless>=4.5.5.62
 numpy>=1.21.0
 ultralytics
+# 系统依赖：libgl1-mesa-glx libglib2.0-0
