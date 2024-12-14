@@ -4,30 +4,6 @@ from PIL import Image
 import xml.etree.ElementTree as ET
 from ultralytics import YOLO
 import numpy as np
-import subprocess
-
-def run_command(command):
-    try:
-        # 执行命令
-        result = subprocess.run(
-            command,  # 命令
-            shell=True,  # 在 Shell 中运行
-            check=True,  # 检查命令执行是否成功
-            text=True,  # 将输出处理为字符串
-            capture_output=True  # 捕获输出结果
-        )
-        print(f"Command executed successfully: {command}")
-        print(result.stdout)  # 打印标准输出
-    except subprocess.CalledProcessError as e:
-        print(f"Error occurred while running command: {command}")
-        print(e.stderr)  # 打印错误信息
-
-# 更新包列表
-run_command("sudo apt-get update")
-
-# 安装 libglu1-mesa
-run_command("sudo apt-get install -y libglu1-mesa")
-
 import cv2
 
 # 设置页面配置
