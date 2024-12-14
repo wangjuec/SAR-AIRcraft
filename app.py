@@ -2,7 +2,7 @@ import streamlit as st
 import os
 from PIL import Image
 import xml.etree.ElementTree as ET
-import cv2
+
 from ultralytics import YOLO
 import numpy as np
 import subprocess
@@ -28,6 +28,8 @@ run_command("sudo apt-get update")
 
 # 安装 libglu1-mesa
 run_command("sudo apt-get install -y libglu1-mesa")
+
+import cv2
 
 # 设置页面配置
 st.set_page_config(layout="centered", 
