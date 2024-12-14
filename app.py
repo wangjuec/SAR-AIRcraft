@@ -2,7 +2,6 @@ import streamlit as st
 import os
 from PIL import Image
 import xml.etree.ElementTree as ET
-
 from ultralytics import YOLO
 import numpy as np
 import subprocess
