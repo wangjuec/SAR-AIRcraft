@@ -2,14 +2,9 @@ import streamlit as st
 import os
 from PIL import Image
 import xml.etree.ElementTree as ET
+import cv2
 from ultralytics import YOLO
 import numpy as np
-
-try:
-    import cv2
-    st.success("OpenCV imported successfully!")
-except Exception as e:
-    st.error(f"Failed to import OpenCV: {str(e)}")
 
 # 设置页面配置
 st.set_page_config(layout="centered", 
