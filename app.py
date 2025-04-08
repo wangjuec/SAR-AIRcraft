@@ -19,7 +19,7 @@ models_folder = "models"
 images_folder = "images"
 
 # Streamlit 应用标题
-st.title("光环51期4组：YOLO :airplane:目标检测演示 ")
+st.title("YOLO目标检测演示/n光环51期4组")
 
 # 选择示例图片或上传图片
 with st.sidebar:
